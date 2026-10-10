@@ -16,8 +16,10 @@
 | 素材 | 路径 | 用途 |
 |---|---|---|
 | **在线宣传落地页** | https://huangtianyu-shen.github.io/mcd-saver/ | 发帖时贴链接，比文字更有说服力；手机端可看 |
+| **QQ 群专用图（1200×675，带二维码）** | [`assets/qq-card.png`](assets/qq-card.png) | QQ 群 / 微信群 —— 手机扫码直达仓库，发一张图就够 |
 | 竖版海报（1080×1440） | [`assets/poster-xiaohongshu.png`](assets/poster-xiaohongshu.png) | 小红书 / 朋友圈配图 |
 | 横版分享卡（1200×630） | [`assets/share-card.png`](assets/share-card.png) | V2EX 帖头图 / X 卡片 / 微信分享 |
+| 仓库二维码（600×600） | [`assets/qrcode.png`](assets/qrcode.png) | 需要单独贴码的场景 |
 | 落地页源码 | [`docs/index.html`](docs/index.html) | 单文件 HTML，改数据后重新截图即可 |
 
 > 配图由 HTML + 无头浏览器渲染生成，**所有数据与仓库实测一致**，没有夸大。
@@ -157,7 +159,67 @@ github.com/huangtianyu-shen/mcd-saver
 
 ---
 
-## 四、X / Twitter（英文）
+## 四、QQ 群 / QQ 空间版本
+
+QQ **不渲染 Markdown**，所以下面两段都是纯文本，整段复制直接粘贴即可，
+不要带 `**`、`#`、`[]()` 这些符号，否则会原样显示成乱码。
+
+### 4.1 极简版（推荐，4 行看完）
+
+```
+🍟 麦麦省钱助手 —— 告诉你怎么点麦当劳最便宜
+
+领光所有券 → 穷举券组合 → 逐个用官方价格引擎试算 → 输出最低实付
+实测：57.70 的购物车，用券后 55.70（这是官方算的，不是我估的）
+
+github.com/huangtianyu-shen/mcd-saver
+在参加麦当劳程序员创意开发大赛，排名看 Star，觉得有意思帮我点个 ⭐ 谢谢！
+```
+
+### 4.2 完整版（技术群、校友群这类人群愿意读的群）
+
+```
+🍟 做了个「麦麦省钱助手」，帮你算怎么点麦当劳最便宜
+
+麦当劳的券散在好几个地方——可领的、门店能用的、积分、限时活动，
+每次点单前都要翻一遍，还经常发现"我有券但这家店用不了"。
+
+于是我基于麦当劳官方 MCP 做了个小工具：
+· 一键领光所有能领的券
+· 穷举券的组合，逐个调官方价格引擎真实试算
+· 告诉你最低实付是多少、差几块能凑单
+
+实测跑通了一次：购物车 57.70，用券后 55.70，省 2 块。
+重点是这个价格是官方算出来的，不是我估的。
+
+开发中还挖到三个坑：
+1. 可领的券没有 ID，得先领进券包才能用
+2. 券包里的券不代表这家店能用（我 5 张券只有 1 张能用）
+3. 有些券"未到使用时间"，只有标签里写了，光看日期会看漏
+
+代码开源了，零依赖纯 Python：
+github.com/huangtianyu-shen/mcd-saver
+
+在参加麦当劳程序员创意开发大赛，排名看 Star，
+觉得有意思的话帮我点个 Star 吧 ⭐ 感谢！
+```
+
+### 4.3 发群操作建议（照着做就行）
+
+1. **先发图**：群相册里传 [`assets/qq-card.png`](assets/qq-card.png)
+   —— 这张图右半边就是二维码，**手机上直接长按识别就能跳到仓库**，
+   省掉"让人手敲网址"这一步，转化率最高。
+2. **再发文字**：粘贴上面 4.1 极简版。图 + 文分两条发，比一条长消息更容易被看到。
+3. **手机党多**的话，文案里补一句在线宣传页（手机上打开比 GitHub 好用）：
+   https://huangtianyu-shen.github.io/mcd-saver/
+4. **一个群只发一次**，刷屏会被踢甚至被举报。
+5. 长消息在 QQ 里会被折叠成"全文"，所以**极简版优先**；技术群、校友群再上完整版。
+
+> 如果想自己在文件里贴二维码，用 [`assets/qrcode.png`](assets/qrcode.png)（600×600，透明背景外的白底）。
+
+---
+
+## 五、X / Twitter（英文）
 
 ```
 Built "mcd-saver" — a money-saving Skill on McDonald's China official MCP.
@@ -177,7 +239,7 @@ Landing page: https://huangtianyu-shen.github.io/mcd-saver/
 
 ---
 
-## 五、发布 Checklist
+## 六、发布 Checklist
 
 - [ ] **先自己 Star 一次**（Star = 0 不进排行榜，任何奖励都拿不到）
 - [ ] **发帖一定带图**：小红书用竖版、V2EX/微信/X 用横版 —— 带图帖的点击率远高于纯链接
@@ -192,7 +254,7 @@ Landing page: https://huangtianyu-shen.github.io/mcd-saver/
 
 ---
 
-## 六、时效性
+## 七、时效性
 
 | 事项 | 时间 |
 |---|---|

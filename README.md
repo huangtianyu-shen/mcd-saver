@@ -175,8 +175,11 @@ mcd-saver/
 │   └── daily_scan.py                 # 一键端到端流水线
 └── assets/
     ├── report.css                    # 日报样式
+    ├── qq-card.png                   # 群宣传图 1200×675（带二维码）
     ├── share-card.png                # 横版分享卡 1200×630
-    └── poster-xiaohongshu.png        # 竖版海报 1080×1440
+    ├── poster-xiaohongshu.png        # 竖版海报 1080×1440
+    ├── qrcode.png                    # 仓库二维码 600×600
+    └── *.src.html                    # 以上配图的 HTML 模板（改数据后重新截图）
 ```
 
 ---
