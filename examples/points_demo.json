@@ -1,0 +1,34 @@
+{
+  "account": {
+    "availablePoint": "3200",
+    "accumulativePoint": "8600",
+    "usedPoint": "5400",
+    "currentMouthExpirePoint": "800",
+    "nextMouthExpirePoint": "1200",
+    "currency": "麦享会积分"
+  },
+  "products": [
+    {"spuId": 100, "spuName": "免费脆薯饼券", "catName": "优惠券", "point": "100", "price": "9", "shopId": 2},
+    {"spuId": 101, "spuName": "麦辣鸡腿堡券", "catName": "优惠券", "point": "400", "price": "24", "shopId": 2},
+    {"spuId": 102, "spuName": "复古棒球帽", "catName": "周边产品", "point": "3000", "price": "0", "shopId": 2},
+    {"spuId": 103, "spuName": "麦金卡7天", "catName": "会员卡", "point": "600", "price": "15", "shopId": 2},
+    {"spuId": 104, "spuName": "麦当劳亲子读书会", "catName": "读书会", "point": "0", "price": "45", "shopId": 5}
+  ],
+  "lottery": {
+    "activityName": "周六麦金喜抽奖",
+    "activityStatusText": "进行中",
+    "drawPoint": "24",
+    "drawTypeText": "消耗积分抽奖",
+    "prizes": [
+      {"name": "积分霸王餐", "typeText": "优惠券"},
+      {"name": "麦金卡7天", "typeText": "会员卡"},
+      {"name": "下单立减3元券", "typeText": "优惠券"},
+      {"name": "圆筒冰淇淋4折优惠券", "typeText": "优惠券"}
+    ],
+    "drawDecision": {"resourceEligible": true, "reason": ""}
+  },
+  "valueHints": {
+    "周边产品": 30
+  },
+  "options": {"maxItems": 20}
+}

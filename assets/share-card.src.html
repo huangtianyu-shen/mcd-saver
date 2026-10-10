@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{width:1200px;height:630px;overflow:hidden;background:#FFFAF3;
+  font-family:"Microsoft YaHei","PingFang SC","Hiragino Sans GB",sans-serif;color:#181410;
+  position:relative;display:flex}
+.left{width:700px;padding:62px 0 62px 66px;display:flex;flex-direction:column;position:relative;z-index:2}
+.right{flex:1;background:#DA291C;position:relative;overflow:hidden;
+  display:flex;flex-direction:column;justify-content:center;padding:0 62px;color:#fff}
+.right .glow{position:absolute;inset:0;
+  background:radial-gradient(520px 420px at 22% 8%,rgba(255,199,44,.50),transparent 62%),
+             radial-gradient(460px 420px at 92% 96%,rgba(255,199,44,.26),transparent 62%)}
+.right>*{position:relative}
+.brand{display:flex;align-items:center;gap:13px}
+.logo{width:46px;height:46px;border-radius:14px;background:#DA291C;display:grid;place-items:center;
+  color:#FFC72C;font-size:27px;font-weight:900;flex:none}
+.brand .t1{font-size:20px;font-weight:800;letter-spacing:-.01em}
+.brand .t2{font-size:14px;color:#8B8177;margin-top:1px}
+h1{font-size:52px;line-height:1.2;font-weight:900;letter-spacing:-.035em;margin-top:44px}
+h1 em{font-style:normal;background:#FFC72C;padding:1px 10px;border-radius:8px;display:inline-block}
+.sub{font-size:19px;line-height:1.6;color:#5A524A;margin-top:22px;max-width:560px;font-weight:600}
+.sub b{color:#DA291C}
+.r-lb{font-size:14px;opacity:.88;font-weight:700;letter-spacing:.05em}
+.r-big{font-size:54px;font-weight:900;letter-spacing:-.03em;line-height:1.12;margin-top:6px;
+  font-variant-numeric:tabular-nums}
+.r-row{display:flex;align-items:baseline;gap:14px;margin-top:4px}
+.r-row .old{font-size:26px;opacity:.6;text-decoration:line-through;text-decoration-thickness:2px}
+.r-row .new{font-size:44px;font-weight:900;color:#FFC72C;letter-spacing:-.03em}
+.r-save{display:inline-block;background:#FFC72C;color:#DA291C;border-radius:12px;
+  padding:9px 18px;font-size:22px;font-weight:900;margin-top:20px}
+.r-line{height:1px;background:rgba(255,255,255,.30);margin:26px 0 20px}
+.r-fine{font-size:14.5px;line-height:1.75;opacity:.94;font-weight:600}
+.r-fine b{color:#FFC72C}
+.r-url{font-size:15px;font-weight:800;margin-top:24px;letter-spacing:-.01em}
+.strip{position:absolute;left:66px;bottom:52px;display:flex;align-items:center;gap:11px;
+  background:#fff;border:1px solid #F0E6D8;border-radius:999px;padding:9px 18px;
+  font-size:14.5px;font-weight:700;color:#5A524A;box-shadow:0 6px 18px rgba(24,20,16,.07)}
+.strip .d{width:8px;height:8px;border-radius:50%;background:#1E8E4E}
+</style></head>
+<body>
+  <div class="left">
+    <div class="brand">
+      <div class="logo">M</div>
+      <div>
+        <div class="t1">麦麦省钱助手 mcd-saver</div>
+        <div class="t2">基于麦当劳中国官方 MCP 的省钱决策 Skill</div>
+      </div>
+    </div>
+    <h1>点麦当劳<br><em>怎么买最省？</em></h1>
+    <p class="sub">券的叠加规则是服务端黑盒，所以它<b>不猜规则</b>——<br>本地穷举所有券组合，逐个交给官方价格引擎<b>真实试算</b>。</p>
+    <div class="strip"><span class="d"></span>真实账号端到端跑通 · 零依赖 Python · MIT 开源</div>
+  </div>
+
+  <div class="right">
+    <div class="glow"></div>
+    <div class="r-lb">真实运行结果</div>
+    <div class="r-row"><span class="old">¥57.70</span><span style="opacity:.5;font-size:26px">→</span><span class="new">¥55.70</span></div>
+    <div class="r-save">官方引擎试算 省 ¥2.00</div>
+    <div class="r-line"></div>
+    <div class="r-fine">券包 5 张 · 这家店真能用 <b>1</b> 张 · <b>3</b> 张"未到使用时间"<br>可领券无 ID 得先领券 · 券包 ≠ 门店可用 · 看日期会漏</div>
+    <div class="r-url">github.com/huangtianyu-shen/mcd-saver　★ Star</div>
+  </div>
+</body></html>

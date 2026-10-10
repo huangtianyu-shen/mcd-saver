@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>麦麦省钱助手 mcd-saver —— 基于麦当劳官方 MCP 的省钱决策 Skill</title>
+<meta name="description" content="给它想吃的和预算，它领光所有券、试算全部组合，告诉你怎么点麦当劳最省。基于麦当劳中国官方 MCP，本地穷举搜索 + 服务端权威定价。">
+<meta property="og:title" content="麦麦省钱助手 mcd-saver">
+<meta property="og:description" content="麦当劳的券叠加规则是服务端黑盒。所以它不猜规则——本地穷举组合，逐个交给官方价格引擎真实试算。">
+<meta property="og:type" content="website">
+<style>
+:root{
+  --red:#DA291C; --red-dark:#B31F14; --yellow:#FFC72C; --yellow-soft:#FFF3CC;
+  --ink:#181410; --ink-2:#5A524A; --ink-3:#8B8177;
+  --bg:#FFFAF3; --card:#FFFFFF; --line:#F0E6D8;
+  --green:#1E8E4E;
+  --shadow:0 1px 2px rgba(24,20,16,.04),0 8px 24px rgba(24,20,16,.06);
+  --shadow-lg:0 2px 4px rgba(24,20,16,.05),0 18px 48px rgba(24,20,16,.10);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1000px;margin:0 auto;padding:0 24px}
+code,.mono{font-family:"SF Mono",SFMono-Regular,ui-monospace,Menlo,Consolas,"Liberation Mono",monospace}
+
+/* ---------- nav ---------- */
+nav{position:sticky;top:0;z-index:50;background:rgba(255,250,243,.88);
+  backdrop-filter:saturate(180%) blur(14px);border-bottom:1px solid var(--line)}
+.nav-in{max-width:1000px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:14px}
+.brand{display:flex;align-items:center;gap:9px;font-weight:800;letter-spacing:-.01em}
+.brand .mark{width:26px;height:26px;border-radius:8px;background:var(--red);
+  display:grid;place-items:center;color:var(--yellow);font-size:15px;font-weight:900}
+.nav-r{margin-left:auto;display:flex;align-items:center;gap:10px}
+.star-btn{display:inline-flex;align-items:center;gap:7px;background:var(--ink);color:#fff;
+  padding:8px 15px;border-radius:999px;font-size:14px;font-weight:600;transition:.18s}
+.star-btn:hover{background:#000;transform:translateY(-1px)}
+.star-btn.yellow{background:var(--yellow);color:var(--ink)}
+.star-btn.yellow:hover{background:#FFD95C}
+.star-count{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--ink-2);
+  border:1px solid var(--line);padding:6px 11px;border-radius:999px;background:#fff}
+
+/* ---------- hero ---------- */
+.hero{padding:76px 0 56px;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;
+  background:radial-gradient(900px 460px at 12% -8%,rgba(255,199,44,.34),transparent 62%),
+             radial-gradient(760px 420px at 92% 4%,rgba(218,41,28,.10),transparent 60%);
+  pointer-events:none}
+.hero .wrap{position:relative}
+.badge{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);
+  padding:6px 13px;border-radius:999px;font-size:13px;color:var(--ink-2);box-shadow:var(--shadow)}
+.badge b{color:var(--red)}
+h1{font-size:clamp(34px,6.2vw,58px);line-height:1.14;letter-spacing:-.025em;font-weight:850;margin:22px 0 0}
+h1 .hl{position:relative;z-index:0}
+h1 .hl::after{content:"";position:absolute;left:0;right:0;bottom:.10em;height:.34em;
+  background:var(--yellow);z-index:-1;border-radius:3px}
+.lede{font-size:clamp(16px,2.2vw,19px);color:var(--ink-2);margin-top:20px;max-width:690px}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:9px;padding:13px 22px;border-radius:12px;
+  font-weight:700;font-size:15px;transition:.18s;border:1px solid transparent}
+.btn-primary{background:var(--red);color:#fff;box-shadow:0 6px 18px rgba(218,41,28,.28)}
+.btn-primary:hover{background:var(--red-dark);transform:translateY(-2px);
+  box-shadow:0 10px 26px rgba(218,41,28,.34)}
+.btn-ghost{background:#fff;color:var(--ink);border-color:var(--line);box-shadow:var(--shadow)}
+.btn-ghost:hover{border-color:var(--ink-3);transform:translateY(-2px)}
+.note{font-size:13px;color:var(--ink-3);margin-top:16px}
+
+/* ---------- terminal ---------- */
+.term{margin-top:44px;background:#1C1917;border-radius:16px;overflow:hidden;
+  box-shadow:var(--shadow-lg);border:1px solid #2E2A26}
+.term-bar{display:flex;align-items:center;gap:7px;padding:11px 15px;background:#262220;border-bottom:1px solid #35302C}
+.term-bar i{width:11px;height:11px;border-radius:50%;display:block}
+.term-bar span{margin-left:8px;font-size:12px;color:#9C948C}
+.term-body{padding:18px 20px 22px;font-size:13.5px;line-height:1.9;overflow-x:auto}
+.t-line{white-space:pre-wrap;word-break:break-word}
+.t-u{color:#FFC72C;font-weight:700}
+.t-a{color:#E8E2DB}
+.t-k{color:#7DD3A0}
+.t-dim{color:#8A817A}
+.t-box{border:1px solid #3A3530;border-radius:9px;padding:12px 14px;margin:10px 0;background:#232020}
+.t-row{display:flex;justify-content:space-between;gap:16px}
+.t-row.hi{color:#FFD95C;font-weight:700}
+.cursor{display:inline-block;width:7px;height:15px;background:#FFC72C;vertical-align:-2px;
+  animation:blink 1.1s step-end infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* ---------- section ---------- */
+section{padding:64px 0}
+.sec-head{margin-bottom:34px}
+.eyebrow{font-size:12.5px;font-weight:800;letter-spacing:.14em;color:var(--red);text-transform:uppercase}
+h2{font-size:clamp(25px,3.6vw,34px);letter-spacing:-.02em;font-weight:820;margin-top:9px;line-height:1.25}
+.sub{color:var(--ink-2);margin-top:11px;max-width:660px}
+
+/* ---------- pain grid ---------- */
+.grid{display:grid;gap:16px}
+.g4{grid-template-columns:repeat(4,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:repeat(2,1fr)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;
+  box-shadow:var(--shadow);transition:.2s}
+.card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);border-color:#E4D6C2}
+.card .ic{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;margin-bottom:13px}
+.card h3{font-size:16px;font-weight:750;margin-bottom:6px;letter-spacing:-.01em}
+.card p{font-size:14px;color:var(--ink-2);line-height:1.65}
+.pain .ic{background:var(--yellow-soft)}
+
+/* ---------- flow ---------- */
+.flow{display:flex;align-items:stretch;gap:0;flex-wrap:wrap}
+.step{flex:1 1 180px;background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:20px;box-shadow:var(--shadow);position:relative}
+.step .n{width:26px;height:26px;border-radius:8px;background:var(--red);color:#fff;
+  display:grid;place-items:center;font-size:13px;font-weight:800;margin-bottom:11px}
+.step h4{font-size:15px;font-weight:750;margin-bottom:5px}
+.step p{font-size:13.5px;color:var(--ink-2);line-height:1.6}
+.step .tool{margin-top:10px;font-size:11.5px;color:var(--ink-3);background:#FBF6EE;
+  border:1px solid var(--line);border-radius:6px;padding:5px 8px;display:inline-block}
+.arrow{display:grid;place-items:center;width:34px;color:var(--red);font-size:19px;font-weight:800;flex:0 0 34px}
+
+/* ---------- proof ---------- */
+.proof{background:linear-gradient(160deg,#FFF6E4,#FFFDF8);border:1px solid var(--line);
+  border-radius:18px;padding:32px;box-shadow:var(--shadow)}
+.cmp{display:flex;align-items:center;gap:22px;flex-wrap:wrap;justify-content:center;margin:24px 0 8px}
+.price{text-align:center}
+.price .lb{font-size:12.5px;color:var(--ink-3);margin-bottom:4px}
+.price .v{font-size:40px;font-weight:850;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.price.base .v{color:var(--ink-3);text-decoration:line-through;text-decoration-thickness:2px}
+.price.final .v{color:var(--red)}
+.arrow2{font-size:30px;color:var(--ink-3)}
+.save{background:var(--green);color:#fff;border-radius:12px;padding:12px 20px;text-align:center}
+.save .v{font-size:26px;font-weight:850;line-height:1.2}
+.save .lb{font-size:12px;opacity:.92}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px;justify-content:center}
+.chip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 13px;
+  font-size:12.5px;color:var(--ink-2)}
+.chip b{color:var(--ink)}
+.verified{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:20px;
+  background:var(--yellow);border-radius:11px;padding:12px 18px;font-size:14px;font-weight:650;
+  color:var(--ink)}
+.verified svg{flex:none}
+
+/* ---------- findings ---------- */
+.find{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px;
+  box-shadow:var(--shadow);border-left:4px solid var(--red)}
+.find .no{font-size:12px;font-weight:800;color:var(--red);letter-spacing:.1em}
+.find h3{font-size:17px;font-weight:780;margin:8px 0 10px;letter-spacing:-.01em}
+.find .bad{font-size:13.5px;color:var(--ink-2);background:#FDF3F1;border-radius:8px;padding:9px 12px;
+  border:1px solid #F6DDD8;margin-bottom:10px}
+.find .fix{font-size:13.5px;color:var(--ink-2)}
+.find .fix b{color:var(--green)}
+.find code{background:#FBF6EE;border:1px solid var(--line);border-radius:5px;padding:1px 5px;
+  font-size:12.5px;color:var(--red-dark)}
+
+/* ---------- table ---------- */
+.tbl{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);
+  border-radius:14px;overflow:hidden;box-shadow:var(--shadow);font-size:14px}
+.tbl th{background:#FBF6EE;text-align:left;padding:13px 18px;font-size:12.5px;font-weight:800;
+  color:var(--ink-2);letter-spacing:.04em;border-bottom:1px solid var(--line)}
+.tbl td{padding:13px 18px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink-2)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl td:first-child{font-weight:650;color:var(--ink);white-space:nowrap}
+.tbl td code{background:#FBF6EE;border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-size:12.5px}
+
+/* ---------- tech ---------- */
+.tags{display:flex;flex-wrap:wrap;gap:9px;margin-top:6px}
+.tag{background:#fff;border:1px solid var(--line);border-radius:9px;padding:9px 14px;
+  font-size:13px;color:var(--ink-2);box-shadow:var(--shadow)}
+.tag b{color:var(--ink);font-weight:700}
+
+/* ---------- final cta ---------- */
+.final{background:var(--ink);color:#fff;border-radius:20px;padding:48px 34px;text-align:center;
+  box-shadow:var(--shadow-lg);position:relative;overflow:hidden}
+.final::after{content:"";position:absolute;width:340px;height:340px;border-radius:50%;
+  background:rgba(255,199,44,.13);right:-110px;top:-140px}
+.final::before{content:"";position:absolute;width:260px;height:260px;border-radius:50%;
+  background:rgba(218,41,28,.20);left:-90px;bottom:-130px}
+.final>*{position:relative}
+.final h2{color:#fff;font-size:clamp(24px,3.4vw,32px)}
+.final p{color:#CFC7BE;margin-top:12px;font-size:15px}
+.final .cta{justify-content:center;margin-top:26px}
+.final .fine{font-size:12.5px;color:#8E857C;margin-top:20px}
+.deadline{display:inline-flex;align-items:center;gap:8px;background:rgba(255,199,44,.16);
+  border:1px solid rgba(255,199,44,.34);color:#FFD95C;border-radius:999px;padding:7px 15px;
+  font-size:13px;font-weight:650;margin-top:18px}
+
+/* ---------- footer ---------- */
+footer{border-top:1px solid var(--line);padding:34px 0 48px;font-size:13px;color:var(--ink-3)}
+footer a{color:var(--ink-2);border-bottom:1px solid var(--line)}
+footer a:hover{color:var(--red);border-color:var(--red)}
+.f-in{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;align-items:flex-start}
+.disclaim{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;
+  margin-bottom:20px;font-size:12.5px;line-height:1.75;color:var(--ink-2)}
+
+/* ---------- reveal ---------- */
+.rv{opacity:0;transform:translateY(16px);transition:opacity .55s ease,transform .55s ease}
+.rv.in{opacity:1;transform:none}
+
+@media(max-width:860px){
+  .g4{grid-template-columns:repeat(2,1fr)}
+  .g3,.g2{grid-template-columns:1fr}
+  .arrow{display:none}
+  .step{margin-bottom:10px}
+  .flow{gap:0}
+  .hero{padding:52px 0 40px}
+  section{padding:48px 0}
+  .tbl td:first-child{white-space:normal}
+  .nav-r .star-count{display:none}
+}
+@media(max-width:520px){
+  .g4{grid-template-columns:1fr}
+  .term-body{font-size:12.5px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-in">
+    <div class="brand"><span class="mark">M</span><span>麦麦省钱助手</span></div>
+    <div class="nav-r">
+      <span class="star-count" id="navStar">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="#FFC72C" stroke="#E0A800" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <span id="navStarNum">—</span>
+      </span>
+      <a class="star-btn yellow" href="https://github.com/huangtianyu-shen/mcd-saver" target="_blank" rel="noopener">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        Star
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="wrap">
+    <span class="badge">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#DA291C" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>
+      <b>麦当劳中国官方 MCP</b> · 真实账号端到端跑通
+    </span>
+
+    <h1>给它想吃的和预算，<br>它<span class="hl">领光所有券、试算全部组合</span>，<br>告诉你怎么点麦当劳最省。</h1>
+
+    <p class="lede">
+      一个基于麦当劳中国官方 MCP 服务的 AI Skill。
+      券的叠加规则是服务端黑盒 —— 所以它<strong>不猜规则</strong>：
+      本地穷举所有券组合，逐个交给官方 <code class="mono">calculate-price</code> 引擎真实试算，取最低实付。
+    </p>
+
+    <div class="cta">
+      <a class="btn btn-primary" href="https://github.com/huangtianyu-shen/mcd-saver" target="_blank" rel="noopener">
+        <svg width="17" height="17" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.32-1.59.83-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 012-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.52.56.83 1.27.83 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        在 GitHub 上 Star
+      </a>
+      <a class="btn btn-ghost" href="#how">它是怎么算的</a>
+      <a class="btn btn-ghost" href="#proof">看真实结果</a>
+    </div>
+    <p class="note">MIT 开源 · 5 个零第三方依赖 Python 脚本 · 调用 13 个 MCP 工具</p>
+
+    <!-- terminal -->
+    <div class="term">
+      <div class="term-bar">
+        <i style="background:#FF5F57"></i><i style="background:#FEBC2E"></i><i style="background:#28C840"></i>
+        <span>mcd-saver · 真实会话</span>
+      </div>
+      <div class="term-body">
+        <div class="t-line"><span class="t-u">你：</span><span class="t-a">我想吃辣堡，怎么买最便宜？</span></div>
+        <div class="t-line" style="margin-top:12px"><span class="t-k">助手：</span><span class="t-dim">已定位门店 → 麦当劳上海黄浦华旭国际大厦餐厅</span></div>
+        <div class="t-line"><span class="t-dim">　　　券包 5 张 →</span> <span class="t-a">本店到店场景真能用 <b>1</b> 张，3 张"未到使用时间"</span></div>
+        <div class="t-box">
+          <div class="t-row"><span class="t-dim">购物车　冰美式中杯 11.90 + 鸡薯双全盒 15.90 + 龙焰芝士棒鸡腿堡三件套 29.90</span></div>
+          <div class="t-row"><span class="t-dim">不用券基准</span><span class="t-dim">57.70 元</span></div>
+          <div class="t-row"><span class="t-a">用「9.9元中杯冰美式」券</span><span class="t-a">55.70 元</span></div>
+          <div class="t-row hi" style="margin-top:6px"><span>官方引擎真实试算实付</span><span>55.70 元　省 2.00 元</span></div>
+        </div>
+        <div class="t-line"><span class="t-k">助手：</span><span class="t-a">这个价格是官方引擎算出来的，不是我估的。</span><span class="cursor"></span></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ PAIN ============ -->
+<section id="pain">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="eyebrow">问题</div>
+      <h2>麦当劳的省钱资源，散在四个互不相通的池子里</h2>
+      <p class="sub">看不全、算不清，所以每次都在多花钱 —— 这不是你不努力，是信息根本没被收敛过。</p>
+    </div>
+    <div class="grid g4">
+      <div class="card pain rv">
+        <div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DA291C" stroke-width="2"><path d="M20 12v9H4v-9M2 7h20v5H2zM12 21V7M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg></div>
+        <h3>可领券</h3>
+        <p>麦麦省里躺着一堆能领的券，没人提醒你，过期就作废。</p>
+      </div>
+      <div class="card pain rv">
+        <div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DA291C" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/></svg></div>
+        <h3>门店可用券</h3>
+        <p>你有券，不代表这家店能用。这是"有券却用不掉"的真正原因。</p>
+      </div>
+      <div class="card pain rv">
+        <div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DA291C" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5h5M9.5 14.5h5"/></svg></div>
+        <h3>会员积分</h3>
+        <p>兑换项几十个，哪个最值？抽奖到底划不划算？没人给你算过。</p>
+      </div>
+      <div class="card pain rv">
+        <div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DA291C" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></div>
+        <h3>限时活动</h3>
+        <p>今天买还是明天买？差一天可能差一整个活动的优惠。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW ============ -->
+<section id="how" style="background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="eyebrow">核心设计</div>
+      <h2>不猜规则，只做试算</h2>
+      <p class="sub">
+        券的叠加规则、门槛判定、可用性校验全在服务端黑盒里。
+        本地写死的规则推算，推出来的价和真实结算价对不上 —— 所以改成：
+        <strong style="color:var(--ink)">本地穷举搜索，服务端权威定价。</strong>
+        一次巡检会发起几十次真实试算，这是人工做不到的部分。
+      </p>
+    </div>
+    <div class="flow rv">
+      <div class="step">
+        <div class="n">1</div><h4>领</h4>
+        <p>领光所有可领券，再对券包做一次体检：哪些本店能用、哪些还没到时间。</p>
+        <span class="tool">auto-bind-coupons</span>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step">
+        <div class="n">2</div><h4>算</h4>
+        <p>穷举单券 / 多券组合 / 凑单方案并剪枝，逐个送官方引擎真实试算，取最低实付。</p>
+        <span class="tool">calculate-price</span>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step">
+        <div class="n">3</div><h4>换</h4>
+        <p>用「元/积分」这把统一尺子给所有兑换项排序；抽奖用盈亏平衡线判断值不值。</p>
+        <span class="tool">mall-points-products</span>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step">
+        <div class="n">4</div><h4>择时</h4>
+        <p>结合活动日历与券有效期，判断现在是下手还是再等等。</p>
+        <span class="tool">campaign-calendar</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROOF ============ -->
+<section id="proof">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="eyebrow">真实运行</div>
+      <h2>不是模拟数据，是真实账号跑出来的</h2>
+      <p class="sub">门店、券、价格全部来自麦当劳中国官方 MCP 服务的实时返回。</p>
+    </div>
+    <div class="proof rv">
+      <div class="cmp">
+        <div class="price base">
+          <div class="lb">不用券基准</div>
+          <div class="v">¥57.70</div>
+        </div>
+        <div class="arrow2">→</div>
+        <div class="price final">
+          <div class="lb">官方引擎试算实付</div>
+          <div class="v">¥55.70</div>
+        </div>
+        <div class="save">
+          <div class="v">省 ¥2.00</div>
+          <div class="lb">真实结算口径</div>
+        </div>
+      </div>
+      <div class="meta">
+        <span class="chip"><b>门店</b> 麦当劳上海黄浦华旭国际大厦餐厅</span>
+        <span class="chip"><b>券包</b> 5 张</span>
+        <span class="chip"><b>本店可用</b> 1 张</span>
+        <span class="chip"><b>未到使用时间</b> 3 张</span>
+        <span class="chip"><b>时间</b> 2026-10-10 13:47</span>
+      </div>
+      <div class="verified">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#181410" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>
+        本地估算 55.70 ＝ 官方引擎返回 55.70 —— 验证了「本地搜索 + 服务端定价」这条链路成立
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FINDINGS ============ -->
+<section id="findings" style="background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="eyebrow">实测发现</div>
+      <h2>三个官方文档没写清楚、但直接决定你省不省得到钱的坑</h2>
+      <p class="sub">这三点是开发过程中真踩到的。不解决它们，"有券"就永远变不成"省钱"。</p>
+    </div>
+    <div class="grid g3">
+      <div class="find rv">
+        <div class="no">FINDING 01</div>
+        <h3>可领券不能直接用来下单</h3>
+        <div class="bad"><code>available-coupons</code> 只返回券名和图片，<b>没有 couponId / couponCode</b>，拿去试算会被服务端拒绝。</div>
+        <div class="fix">→ 必须先 <code>auto-bind-coupons</code> 领进券包，再从券包取带 ID 的券对象。</div>
+      </div>
+      <div class="find rv">
+        <div class="no">FINDING 02</div>
+        <h3>券包里的券 ≠ 这个门店能用</h3>
+        <div class="bad"><code>query-my-coupons</code> 不做门店和渠道校验，只说明"你拥有它"。实测券包 5 张，指定门店到店场景<b>只有 1 张真能用</b>。</div>
+        <div class="fix">→ 必须用 <code>query-store-coupons</code> 校验。这是"有券却用不掉"的根本原因。</div>
+      </div>
+      <div class="find rv">
+        <div class="no">FINDING 03</div>
+        <h3>券可能"未到使用时间"，只有标签会告诉你</h3>
+        <div class="bad">实测 3 张券的生效日期是次日 / 下周，<code>instructions.labels</code> 明确写着"未到使用时间"。<b>只看有效期会误判</b>。</div>
+        <div class="fix">→ 必须读 <code>labels[].text</code>，不能只看起止日期。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FEATURES ============ -->
+<section id="features">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="eyebrow">能力</div>
+      <h2>它能做什么</h2>
+    </div>
+    <div class="rv">
+      <table class="tbl">
+        <thead><tr><th style="width:150px">能力</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td>一键领券 + 券包体检</td><td>领光麦麦省所有可领券；直接告诉你「券包 N 张，本店这个场景只真能用 M 张，还有 K 张没到使用时间」</td></tr>
+          <tr><td>券组合试算</td><td>穷举单券 / 多券组合 / 凑单方案，用官方价格引擎逐个真实试算，输出最低实付方案对照表</td></tr>
+          <tr><td>凑单净收益</td><td>满减差一点达标时，算清「再加一件还净省多少钱」；买赠差件时提示「实付不变多得一件」</td></tr>
+          <tr><td>积分价值排序</td><td>用「元/积分」统一尺子给所有兑换项排序；抽奖用<b>盈亏平衡线</b>判断，不编造概率</td></tr>
+          <tr><td>过期优先级</td><td>快过期的积分优先花掉 —— 归零的价值是 0</td></tr>
+          <tr><td>活动择时</td><td>结合活动日历判断「现在买还是再等等」</td></tr>
+          <tr><td>省钱日报</td><td>把以上全部渲染成一份 HTML 日报</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TECH ============ -->
+<section id="tech" style="background:#fff;border-top:1px solid var(--line)">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="eyebrow">技术</div>
+      <h2>零第三方依赖，clone 下来就能跑</h2>
+      <p class="sub">全部脚本只用 Python 标准库，<code class="mono">python3 scripts/xxx.py</code> 直接执行。</p>
+    </div>
+    <div class="tags rv">
+      <span class="tag"><b>自建 MCP 客户端</b> Streamable HTTP，兼容纯 JSON 与 SSE 双响应体</span>
+      <span class="tag"><b>5 个脚本</b> 客户端 / 券优化器 / 积分顾问 / 日报渲染 / 端到端流水线</span>
+      <span class="tag"><b>13 个 MCP 工具</b> 覆盖领券、试算、积分、活动、门店</span>
+      <span class="tag"><b>单位陷阱</b> 接口收发用「分」，展示层才转「元」，杜绝双重换算</span>
+      <span class="tag"><b>业务错误 ≠ 协议错误</b> <code>success:false</code> + code 是麦当劳业务拒绝，不重试</span>
+      <span class="tag"><b>每个脚本带 --self-test</b> 内置样例与断言，改完一条命令回归</span>
+      <span class="tag"><b>写操作需确认</b> 下单 / 抽奖 / 取消绝不自动执行</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FINAL CTA ============ -->
+<section id="star">
+  <div class="wrap">
+    <div class="final rv">
+      <h2>如果它对你有用，请给它一个 Star</h2>
+      <p>这是「麦当劳程序员创意开发大赛」参赛作品，排名依据公开 Star 数。<br>你的一个 Star，就是对这个项目的全部支持。</p>
+      <div class="cta">
+        <a class="btn btn-primary" href="https://github.com/huangtianyu-shen/mcd-saver" target="_blank" rel="noopener">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          Star 这个项目
+        </a>
+        <a class="btn btn-ghost" href="https://github.com/huangtianyu-shen/mcd-saver#readme" target="_blank" rel="noopener" style="background:rgba(255,255,255,.10);color:#fff;border-color:rgba(255,255,255,.22)">
+          读 README
+        </a>
+      </div>
+      <div class="deadline">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+        报名与拉票截止 2026-10-25 23:59 · 10-26 00:00 定榜
+      </div>
+      <p class="fine">只求真实 Star —— 刷量、机器人、批量注册违反活动规则，会被取消参赛资格与全部奖励。</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="disclaim">
+      <b>免责声明：</b>本项目为参加「麦当劳程序员创意开发大赛」的个人非商业作品，由参赛者独立开发，
+      <b>非麦当劳官方产品，亦非 WorkBuddy 官方产品</b>。全部数据通过麦当劳中国官方 MCP 服务（https://mcp.mcd.cn）实时获取，
+      不使用任何未公开的内部接口。「麦当劳」「McDonald's」「麦麦省」「麦乐送」等商标归其权利人所有，本项目不构成任何授权或官方背书。
+      所有优惠信息、价格与可用性以麦当劳官方渠道及官方 <code class="mono">calculate-price</code> 引擎的实时返回为准，本项目输出仅供参考。
+      本项目不会在未经用户确认的情况下执行下单、取消订单、积分抽奖等消费型操作。
+    </div>
+    <div class="f-in">
+      <div>
+        <a href="https://github.com/huangtianyu-shen/mcd-saver" target="_blank" rel="noopener">GitHub 仓库</a> ·
+        <a href="https://github.com/M-China/mcd-developer-innovation-challenge" target="_blank" rel="noopener">赛事主页</a> ·
+        <a href="https://open.mcd.cn/mcp" target="_blank" rel="noopener">申请 MCP Token</a>
+      </div>
+      <div>MIT License · © 2026 · 使用腾讯 WorkBuddy 开发</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// 渐入动画
+const io = new IntersectionObserver((es) => {
+  es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.rv').forEach(el => io.observe(el));
+
+// 拉真实 Star 数（失败则降级为 —）
+fetch('https://api.github.com/repos/huangtianyu-shen/mcd-saver')
+  .then(r => r.ok ? r.json() : Promise.reject())
+  .then(d => {
+    const n = d.stargazers_count;
+    if (typeof n === 'number') {
+      document.getElementById('navStarNum').textContent = n;
+    }
+  })
+  .catch(() => {});
+</script>
+</body>
+</html>

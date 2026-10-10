@@ -1,0 +1,34 @@
+{
+  "cart": [
+    {"productCode": "9900004064", "name": "麦辣鸡腿堡", "quantity": 2, "unitPrice": "24.00"},
+    {"productCode": "521950", "name": "麦旋风", "quantity": 1, "unitPrice": "15.00"}
+  ],
+  "coupons": [
+    {"couponId": "C1", "couponCode": "CODE1", "couponName": "人气麦旋风买一送一"},
+    {"couponId": "C2", "couponCode": "CODE2", "couponName": "9.9元中杯冰美式",
+     "applicableProducts": ["9300001"]},
+    {"couponId": "C3", "couponCode": "CODE3", "couponName": "下单立减5元券",
+     "thresholdAmount": "50.00", "discountAmount": "5.00"},
+    {"couponId": "C4", "couponCode": "CODE4", "couponName": "满60减12券",
+     "rules": {"kind": "amount_off", "threshold": 6000, "off": 1200}},
+    {"couponId": "C5", "couponCode": "CODE5", "couponName": "巧克力味厚松饼猪柳蛋套餐",
+     "discountInfo": {"discountValue": "29.9", "discountDesc": "用券价格"},
+     "orderTypes": [1], "beTypes": [1, 5]}
+  ],
+  "menuIndex": [
+    {"code": "2001", "name": "薯条(小)", "price": "9.00"},
+    {"code": "2002", "name": "圆筒冰淇淋", "price": "5.00"},
+    {"code": "2003", "name": "麦旋风", "price": "15.00"}
+  ],
+  "assumptions": {
+    "storeCode": "1450713",
+    "orderType": 1,
+    "beType": 1
+  },
+  "options": {
+    "maxPlans": 8,
+    "maxCouponsPerOrder": 2,
+    "topCoupons": 6,
+    "allowFiller": true
+  }
+}

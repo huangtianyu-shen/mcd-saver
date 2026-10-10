@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{width:1080px;height:1440px;overflow:hidden;background:#DA291C;
+  font-family:"Microsoft YaHei","PingFang SC","Hiragino Sans GB",sans-serif;
+  position:relative;color:#fff}
+.bg{position:absolute;inset:0;
+  background:radial-gradient(900px 700px at 8% -6%,rgba(255,199,44,.55),transparent 60%),
+             radial-gradient(800px 700px at 96% 104%,rgba(255,199,44,.28),transparent 60%)}
+.pad{position:relative;padding:86px 78px;height:100%;display:flex;flex-direction:column}
+.top{display:flex;align-items:center;gap:16px}
+.logo{width:66px;height:66px;border-radius:20px;background:#FFC72C;display:grid;place-items:center;
+  font-size:38px;font-weight:900;color:#DA291C;flex:none}
+.top .t1{font-size:27px;font-weight:800;letter-spacing:-.01em}
+.top .t2{font-size:19px;opacity:.9;margin-top:2px}
+h1{font-size:88px;line-height:1.16;font-weight:900;letter-spacing:-.035em;margin-top:74px}
+h1 em{font-style:normal;background:#FFC72C;color:#DA291C;padding:2px 14px;border-radius:10px;
+  display:inline-block;transform:rotate(-1.2deg)}
+.lede{font-size:34px;line-height:1.55;margin-top:38px;opacity:.96;font-weight:600}
+.lede b{color:#FFC72C}
+.card{margin-top:52px;background:rgba(255,255,255,.13);border:1.5px solid rgba(255,255,255,.30);
+  border-radius:28px;padding:42px 44px;backdrop-filter:blur(4px)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:20px}
+.blk .lb{font-size:22px;opacity:.85}
+.blk .v{font-size:62px;font-weight:900;letter-spacing:-.03em;line-height:1.15;
+  font-variant-numeric:tabular-nums}
+.blk.base .v{opacity:.62;text-decoration:line-through;text-decoration-thickness:4px}
+.blk.fin .v{color:#FFC72C}
+.ar{font-size:52px;opacity:.55}
+.save{background:#FFC72C;color:#DA291C;border-radius:18px;padding:14px 26px;text-align:center;flex:none}
+.save .v{font-size:42px;font-weight:900;line-height:1.1}
+.save .lb{font-size:19px;font-weight:700;opacity:.8}
+.divider{height:1px;background:rgba(255,255,255,.28);margin:34px 0 26px}
+.stamp{font-size:25px;font-weight:700;line-height:1.6}
+.stamp span{display:inline-block;background:rgba(255,199,44,.20);border:1px solid rgba(255,199,44,.5);
+  color:#FFD95C;border-radius:8px;padding:3px 10px;font-size:21px;font-weight:800;margin-right:8px}
+.finds{margin-top:auto;display:flex;flex-direction:column;gap:16px}
+.fi{display:flex;gap:16px;align-items:flex-start;background:rgba(0,0,0,.16);border-radius:16px;
+  padding:19px 22px}
+.fi .n{background:#FFC72C;color:#DA291C;width:38px;height:38px;border-radius:11px;flex:none;
+  display:grid;place-items:center;font-size:21px;font-weight:900}
+.fi .tx{font-size:25px;line-height:1.5;font-weight:600}
+.fi .tx b{color:#FFC72C}
+.bot{margin-top:44px;border-top:2px solid rgba(255,255,255,.30);padding-top:34px;
+  display:flex;align-items:center;justify-content:space-between}
+.url{font-size:29px;font-weight:800;letter-spacing:-.01em}
+.url small{display:block;font-size:20px;font-weight:600;opacity:.82;margin-top:6px}
+.star{background:#FFC72C;color:#DA291C;border-radius:999px;padding:20px 40px;font-size:32px;
+  font-weight:900;display:flex;align-items:center;gap:12px;flex:none}
+</style></head>
+<body>
+<div class="bg"></div>
+<div class="pad">
+  <div class="top">
+    <div class="logo">M</div>
+    <div>
+      <div class="t1">麦麦省钱助手 mcd-saver</div>
+      <div class="t2">基于麦当劳中国官方 MCP 的省钱决策 Skill</div>
+    </div>
+  </div>
+
+  <h1>点麦当劳<br><em>怎么买最省？</em></h1>
+
+  <p class="lede">给它想吃的和预算，它<b>领光所有券、试算全部组合</b>，<br>告诉你最低实付是多少。</p>
+
+  <div class="card">
+    <div class="row">
+      <div class="blk base"><div class="lb">不用券基准</div><div class="v">¥57.70</div></div>
+      <div class="ar">→</div>
+      <div class="blk fin"><div class="lb">官方引擎试算实付</div><div class="v">¥55.70</div></div>
+      <div class="save"><div class="v">省 ¥2.00</div><div class="lb">真实账号跑通</div></div>
+    </div>
+    <div class="divider"></div>
+    <div class="stamp"><span>实测</span>券包 5 张 · 这家店真能用只有 1 张 · 3 张"未到使用时间"</div>
+  </div>
+
+  <div class="finds">
+    <div class="fi"><div class="n">1</div><div class="tx">可领券<b>没有 ID</b>，得先领进券包才能用于下单</div></div>
+    <div class="fi"><div class="n">2</div><div class="tx">券包里的券<b>不代表这家店能用</b>——这才是"有券用不掉"的原因</div></div>
+    <div class="fi"><div class="n">3</div><div class="tx">券可能<b>"未到使用时间"</b>，只有标签里写了，看日期会漏</div></div>
+  </div>
+
+  <div class="bot">
+    <div class="url">github.com/huangtianyu-shen/mcd-saver
+      <small>零依赖 Python · MIT 开源 · 麦当劳程序员创意开发大赛参赛作品</small>
+    </div>
+    <div class="star">★ Star</div>
+  </div>
+</div>
+</body></html>

@@ -1,0 +1,33 @@
+# ---- 凭证：绝对不要提交 ----
+.env
+.env.*
+!.env.example
+*.token
+*mcp*token*
+secrets.json
+
+# ---- 运行产物 ----
+省钱日报.html
+省钱日报.json
+*_result.json
+plan_result.json
+points_result.json
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# ---- 编辑器 / 系统 ----
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- 其它 ----
+dist/
+*.log
